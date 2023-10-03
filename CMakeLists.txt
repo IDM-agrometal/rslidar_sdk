@@ -57,7 +57,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
   add_definitions(-O3)
 endif()
 
-if($ENV{ROS_DISTRO} STREQUAL "humble")  # the ros2 humble requires c++17
+if($ENV{ROS_VERSION} STREQUAL "2")  # ros2 requires c++17
 add_definitions(-std=c++17)
 else()
 add_definitions(-std=c++14)
