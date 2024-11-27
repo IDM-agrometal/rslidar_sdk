@@ -5,20 +5,25 @@
   <description>The rslidar_sdk package</description>
   <maintainer email="ron.zheng@robosense.cn">robosense</maintainer>
   <license>BSD</license>
+
+  <!-- Build Tool Depend -->
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <!-- Build Dependencies -->
   <build_depend>rclcpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
+  <build_depend>rclcpp_components</build_depend>  <!-- Ensure this is in build_depend -->
+
+  <!-- Executable Dependencies -->
   <exec_depend>rclcpp</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-  <depend>rslidar_msg</depend>
+  <exec_depend>rclcpp_components</exec_depend> <!-- Add exec_depend for runtime use -->
+
+  <depend>rslidar_msg</depend>  <!-- Regular runtime dependencies -->
+  
   <export>
      <build_type>ament_cmake</build_type>
   </export>
-  
 </package>
-
-
-
