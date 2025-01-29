@@ -137,6 +137,7 @@ if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
   find_package(ament_cmake REQUIRED)
   find_package(sensor_msgs REQUIRED)
   find_package(rslidar_msg REQUIRED)
+  find_package(rclcpp_components REQUIRED)
   find_package(std_msgs REQUIRED)                      
 
 else(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
@@ -162,11 +163,21 @@ include_directories(${rs_driver_INCLUDE_DIRS})
 # Build Setup
 #========================
 
+# Normal node #
+
 add_executable(rslidar_sdk_node
                node/rslidar_sdk_node.cpp
                src/manager/node_manager.cpp)
 
 target_link_libraries(rslidar_sdk_node                   
+                      ${YAML_CPP_LIBRARIES}
+                      ${rs_driver_LIBRARIES})
+
+# Composable node #
+
+add_library(rslidar_sdk_component SHARED node/rslidar_sdk_component src/manager/node_manager.cpp)
+
+target_link_libraries(rslidar_sdk_component                   
                       ${YAML_CPP_LIBRARIES}
                       ${rs_driver_LIBRARIES})
 
@@ -190,14 +201,37 @@ endif(roscpp_FOUND)
 #Ros2#
 if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
 
+  # Normal node #
+
   ament_target_dependencies(rslidar_sdk_node 
     rclcpp 
     std_msgs 
     sensor_msgs 
     rslidar_msg)
+  
+  # Composable node #
+
+  rclcpp_components_register_node(
+    rslidar_sdk_component
+    PLUGIN "RSLidarSDKNode"
+    EXECUTABLE rslidar_sdk
+  )
+
+  ament_export_targets(export_rslidar_sdk_component)
+
+  ament_target_dependencies(rslidar_sdk_component
+    rclcpp 
+    std_msgs 
+    sensor_msgs
+    rclcpp_components 
+    rslidar_msg)
 
   install(TARGETS
-    rslidar_sdk_node
+    rslidar_sdk_component rslidar_sdk_node
+    EXPORT export_rslidar_sdk_component
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
     DESTINATION lib/${PROJECT_NAME})
 
   install(DIRECTORY
@@ -208,4 +242,3 @@ if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
   ament_package()
 
 endif(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
-
